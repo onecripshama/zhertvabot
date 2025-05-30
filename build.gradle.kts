@@ -1,6 +1,20 @@
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.9.0"
     application
+}
+
+application {
+    mainClass.set("bot.MainKt")
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
+
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
 }
 
 repositories {
@@ -14,11 +28,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     testImplementation(kotlin("test"))
 }
-
-application {
-    mainClass.set("bot.MainKt")
-}
-
 
 tasks.test {
     useJUnitPlatform()
