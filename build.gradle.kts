@@ -8,6 +8,8 @@ application {
 }
 
 tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
     }
@@ -16,6 +18,7 @@ tasks.jar {
         configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
     })
 }
+
 
 repositories {
     mavenCentral()
