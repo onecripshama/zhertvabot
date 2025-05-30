@@ -31,7 +31,7 @@ fun main() {
                     voiceFile.delete() // Удаляем временный файл после отправки
                 } catch (e: Exception) {
                     e.printStackTrace() // Логируем ошибку
-                    bot.sendMessage(chatId, "⚠️ Ошибка синтеза: ${e.message}")
+                    bot.sendMessage(chatId, "Ошибка синтеза: ${e.message}")
                 }
             }
         }
