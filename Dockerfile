@@ -1,17 +1,22 @@
-# Используем официальный образ OpenJDK 17
+# Используем официальный OpenJDK 17 (легковесный slim образ)
 FROM openjdk:17-jdk-slim
 
-# Устанавливаем рабочую директорию внутри контейнера
+# Устанавливаем рабочую директорию в контейнере
 WORKDIR /app
 
-# Копируем все файлы проекта в контейнер
-COPY . .
+# Копируем файлы gradle wrapper и настройки сначала (для кэширования)
+COPY gradlew .
+COPY gradle gradle
 
-# Даем права на запуск gradlew
-RUN chmod +x ./gradlew
+# Копируем файлы проекта
+COPY build.gradle.kts settings.gradle.kts ./
+COPY src src
 
-# Собираем проект
+# Делаем gradlew исполняемым
+RUN chmod +x gradlew
+
+# Запускаем сборку проекта (без запуска демона Gradle)
 RUN ./gradlew build --no-daemon
 
-# Запускаем бота
+# Команда запуска бота
 CMD ["./gradlew", "run"]
