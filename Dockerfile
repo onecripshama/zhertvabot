@@ -1,20 +1,25 @@
+# Этап 1: Сборка приложения с Gradle
+FROM gradle:8.1.1-jdk17 AS builder
+
+WORKDIR /app
+
+# Кэшируем зависимости
+COPY build.gradle.kts settings.gradle.kts ./
+RUN gradle dependencies --no-daemon || true
+
+# Копируем остальной проект и собираем
+COPY . .
+RUN gradle clean build --no-daemon --no-parallel
+
+# Этап 2: Минимальный образ для запуска
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# копируем wrapper
-COPY gradlew .
-COPY gradle gradle
+# Копируем jar-файл из стадии сборки
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-# копируем остальные файлы
-COPY build.gradle.kts settings.gradle.kts ./
-COPY src src
+ENV TELEGRAM_BOT_TOKEN=7615955771:AAGdP34f9RgPOJEqj3ZSRT6aDWlQk7M2lh4
 
-# даем права на исполнение
-RUN chmod +x ./gradlew
-
-# собираем проект (без загрузки JDK toolchain)
-RUN ./gradlew build --no-daemon
-
-# запускаем бота
-CMD ["./gradlew", "run", "--no-daemon"]
+# Точка входа
+ENTRYPOINT ["java", "-jar", "app.jar"]
