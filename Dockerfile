@@ -1,25 +1,20 @@
-# Используем официальный образ Gradle для сборки
-FROM gradle:7.6.1-jdk17-alpine AS build
+FROM openjdk:17-jdk-slim
+
 WORKDIR /app
 
-# Копируем исходные коды и файлы сборки
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY src ./src
+# копируем wrapper
+COPY gradlew .
+COPY gradle gradle
 
-# Собираем приложение
-RUN gradle build --no-daemon
+# копируем остальные файлы
+COPY build.gradle.kts settings.gradle.kts ./
+COPY src src
 
-# Финальный образ
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
+# даем права на исполнение
+RUN chmod +x ./gradlew
 
-# Копируем собранный JAR из предыдущего этапа
-COPY --from=build /app/build/libs/*.jar app.jar
+# собираем проект (без загрузки JDK toolchain)
+RUN ./gradlew build --no-daemon
 
-# Устанавливаем переменные окружения
-ENV TELEGRAM_BOT_TOKEN="7615955771:AAGdP34f9RgPOJEqj3ZSRT6aDWlQk7M2lh4"
-ENV TZ=Europe/Moscow
-
-# Запускаем приложение
-CMD ["java", "-jar", "app.jar"]
+# запускаем бота
+CMD ["./gradlew", "run", "--no-daemon"]
