@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: zhertvabot
+    env: docker
+    plan: free
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        value: 7615955771:AAGdP34f9RgPOJEqj3ZSRT6aDWlQk7M2lh4

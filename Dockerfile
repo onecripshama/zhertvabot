@@ -19,7 +19,7 @@ WORKDIR /app
 # Копируем jar-файл из стадии сборки
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-ENV TELEGRAM_BOT_TOKEN=7615955771:AAGdP34f9RgPOJEqj3ZSRT6aDWlQk7M2lh4
+ENV TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
 
 # Точка входа
 ENTRYPOINT ["java", "-jar", "app.jar"]
