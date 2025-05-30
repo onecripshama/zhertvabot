@@ -5,6 +5,8 @@ import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.message
+import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
+import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
 
 fun main() {
     val token = System.getenv("TELEGRAM_BOT_TOKEN") ?: error("ERROR: TELEGRAM_BOT_TOKEN not set")
@@ -17,9 +19,19 @@ fun main() {
                 val chatId = ChatId.fromId(message.chat.id)
 
                 try {
-                    // Добавим проверку длины текста
                     if (text.length > 200) {
-                        bot.sendMessage(chatId, "Текст слишком длинный (макс. 200 символов). Ваш текст: ${text.length}")
+                        bot.sendSticker(
+                            chatId = chatId,
+                            sticker = "CAACAgIAAxkBAAEOgjFoKETTxDt5litsH9rLbdLQTYSI8wACDHMAAoJeKUmf_ZuXfNoHIjYE",
+                            replyMarkup = InlineKeyboardMarkup.create(
+                                listOf(
+                                    InlineKeyboardButton.CallbackData(
+                                        text = "ОКАК",
+                                        callbackData = "repeat_sticker"
+                                    )
+                                )
+                            )
+                        )
                         return@message
                     }
 
@@ -28,9 +40,9 @@ fun main() {
                         chatId = chatId,
                         audio = voiceFile
                     )
-                    voiceFile.delete() // Удаляем временный файл после отправки
+                    voiceFile.delete()
                 } catch (e: Exception) {
-                    e.printStackTrace() // Логируем ошибку
+                    e.printStackTrace()
                     bot.sendMessage(chatId, "Ошибка синтеза: ${e.message}")
                 }
             }
