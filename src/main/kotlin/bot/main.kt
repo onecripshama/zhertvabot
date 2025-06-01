@@ -7,6 +7,9 @@ import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.message
 import com.github.kotlintelegrambot.entities.InlineKeyboardMarkup
 import com.github.kotlintelegrambot.entities.keyboard.InlineKeyboardButton
+import com.sun.net.httpserver.HttpServer
+import java.net.InetSocketAddress
+import kotlin.concurrent.thread
 
 fun main() {
     val token = System.getenv("TELEGRAM_BOT_TOKEN") ?: error("ERROR: TELEGRAM_BOT_TOKEN not set")
@@ -48,5 +51,21 @@ fun main() {
             }
         }
     }
+
+    val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
+
+    // фейк сервер в отдельном потоке потому что я бомжара и у меня нет денег на подписку background worker
+    thread {
+        val server = HttpServer.create(InetSocketAddress(port), 0)
+        server.createContext("/") { exchange ->
+            val response = "Bot is running"
+            exchange.sendResponseHeaders(200, response.length.toLong())
+            exchange.responseBody.use { it.write(response.toByteArray()) }
+        }
+        server.executor = null
+        server.start()
+        println("Fake HTTP server started on port $port")
+    }
+
     bot.startPolling()
 }
